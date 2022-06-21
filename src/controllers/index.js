@@ -91,6 +91,33 @@ const createCheckoutSession = async (req, res) => {
     res.json({ url: session.url});
 };
 
+const getCards = async (req, res) => {
+    const {userId} = req.body;
+
+    // Find the user in the db
+    const [dbUser] = Users.filter(usr => usr.id === userId);
+
+    // Check that the user exist and that the stripeId is valid
+    
+    // List customer cards
+    const {data:rawCards} = await stripe.customers.listPaymentMethods(
+        dbUser.stripeId,
+        {type: 'card'}
+    );
+
+    // Format the cards
+    const cards = rawCards.map(card => ({
+        id: card.id,
+        name: card.billing_details.name,
+        brand: card.card.brand,
+        last4: card.card.last4
+    }));
+
+    // Send the cards
+    res.json(cards);
+};
+
 module.exports = {
     createCheckoutSession,
-}
+    getCards
+};

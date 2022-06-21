@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Get yours credit cards</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;   
+        }
+        form {
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <form>
+        <input type="number" name="user-id" id="user-id" min="0" value="1" placeholder="Put a user id">
+        <input type="submit" value="Get Cards">
+    </form>
+    <hr>
+    <div id="cards-container"></div>
+</body>
+<script>
+    const form = document.querySelector("form");
+    const idInput = document.querySelector("#user-id");
+    const cardsContainer = document.querySelector("#cards-container");
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        // Get all the cards associated with a customer 
+        const data = await fetch("/cards", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({userId: idInput.value})
+        });
+        const cards = await data.json();
+
+        if(cards.length > 0) {
+            const table = document.createElement("div");
+            cards.forEach(card => {
+                
+                // Create the row
+                const row = document.createElement("div");
+                row.style["display"] = "flex";
+                row.style["justify-content"] = "center";
+                row.style["gap"] = "20px";
+                row.style["border"] = "1px solid black";
+                row.style["padding"] = "20px";
+
+                // Add the card data to the row
+                const id = document.createElement("p");
+                id.textContent = card.id;
+                row.appendChild(id);
+                const name = document.createElement("p");
+                name.textContent = card.name;
+                row.appendChild(name);
+                const brand = document.createElement("p");
+                brand.textContent = card.brand;
+                row.appendChild(brand);
+                const last4 = document.createElement("p");
+                last4.textContent = "*** " + card.last4;
+                row.appendChild(last4);
+
+                // Add a button to delete a card
+                const btn = document.createElement("button");
+                btn.innerHTML = "X";
+                btn.addEventListener("click", () => {
+                    console.log("btn id: ", card.id);
+                })
+                row.appendChild(btn);
+
+                // Add the row to the table
+                table.appendChild(row);
+            });
+            cardsContainer.appendChild(table);
+        };
+    });
+</script>
+</html>
