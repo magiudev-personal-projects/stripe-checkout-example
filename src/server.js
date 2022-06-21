@@ -1,11 +1,14 @@
 const express = require("express");
 const cors = require("cors");
 const {port, clientUrl} = require("./config");
-const {createCheckoutSession, getCards, deleteCard} = require("./controllers");
+const {createCheckoutSession, getCards, deleteCard, manageResult} = require("./controllers");
 
 const app = express();
 app.use(cors({origin: clientUrl}));
-app.use(express.static("front"))
+app.use(express.static("front"));
+
+app.post("/webhook", express.raw({type: 'application/json'}), manageResult);
+
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 

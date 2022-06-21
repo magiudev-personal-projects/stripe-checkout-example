@@ -1,4 +1,4 @@
-const {stripePrivateKey, clientUrl} = require("../config");
+const {stripePrivateKey, clientUrl, stripeWebhookSecret} = require("../config");
 const stripe = require("stripe")(stripePrivateKey);
 const {Users, Products} = require("../tempDb");
 
@@ -128,8 +128,36 @@ const deleteCard = async (req, res) => {
     res.json({ msg: "card " + cardId + " deleted"});
 };
 
+const manageResult = (req, res) => {
+    const payload = req.body;
+    
+    // Verify events came from Stripe
+    const sig = req.headers["stripe-signature"];
+    let event;
+    try {
+      event = stripe.webhooks.constructEvent(payload, sig, stripeWebhookSecret);
+    } catch (err) {
+        console.log(err);
+        return res.status(401).json({msg : "Unauthorized"});
+    }
+
+    const session = event.data.object;
+    
+    // Handle a successful payment event
+    if ((event.type === 'checkout.session.completed' && session.payment_status === 'paid') || event.type === "checkout.session.async_payment_succeeded") console.log("Fulfilling order", session.id);
+    
+    // Handle async payment failed 
+    else if (event.type === "checkout.session.async_payment_failed") console.log("Payment of the order ", session.id, " failed");
+    
+    // Handle an expired session
+    else if (event.type === "checkout.session.expired") console.log("Return items of the order ", session.id, " to inventory");
+
+    res.status(200).end(); // https://stackoverflow.com/questions/68430597/stripe-webhook-using-cli-fails-to-post-returns-client-timeout-exceeded-while-a
+};
+
 module.exports = {
     createCheckoutSession,
     getCards,
-    deleteCard
+    deleteCard,
+    manageResult
 };
