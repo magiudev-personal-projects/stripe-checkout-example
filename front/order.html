@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order</title>
+</head>
+<body>
+    <form id="form" style="display: flex; flex-direction: column; gap: 10px; width: 150px;" action="/create-checkout-session" method="POST">
+        <label for="user-id">User id: <input type="number" name="user-id" id="user-id" value="1" min="1"></label>
+        <label for="id-one">ID product one: <input type="text" name="id-one" id="id-one" value="1"></label>
+        <label for="quantity-one">Quantity product one: <input type="number" name="quantity-one" id="quantity-one" min="1" max="100" value="2"></label>
+        <label for="id-two">ID product two: <input type="text" name="id-two" id="id-two" value="2"></label>
+        <label for="quantity-two" >Quantity product two: <input type="number" name="quantity-two" id="quantity-two" min="1" max="100" value="1"></label>
+        <button type="submit">Checkout</button>
+    </form>
+</body>
+    <script>
+        const form = document.getElementById("form");
+
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const userId = document.getElementById("user-id").value; 
+            const idOne = document.getElementById("id-one").value;
+            const qttyOne = document.getElementById("quantity-one").value;
+            const idTwo = document.getElementById("id-two").value;
+            const qttyTwo = document.getElementById("quantity-two").value;
+
+            const data = await fetch("/create-checkout-session", {
+                method: "POST",
+                headers: {
+                "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    userId,
+                    products: [
+                        {id: idOne, quantity: qttyOne},
+                        {id: idTwo, quantity: qttyTwo}
+                    ]
+                })
+            });
+            const {url} = await data.json();
+            if(url) location.assign(url);
+        });
+    </script>
+</html>
