@@ -70,9 +70,18 @@
                 // Add a button to delete a card
                 const btn = document.createElement("button");
                 btn.innerHTML = "X";
-                btn.addEventListener("click", () => {
-                    console.log("btn id: ", card.id);
-                })
+                btn.addEventListener("click", async () => {
+
+                    // Delete card
+                    const rawResult = await fetch("/card", {
+                        method: "DELETE",
+                        headers: { "Content-Type": "application/json"},
+                        body: JSON.stringify({cardId: card.id})
+                    });
+                    const result = await rawResult.json();
+                    console.log(result);
+                    location.assign("/getCards.html");
+                });
                 row.appendChild(btn);
 
                 // Add the row to the table

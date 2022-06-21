@@ -117,7 +117,19 @@ const getCards = async (req, res) => {
     res.json(cards);
 };
 
+const deleteCard = async (req, res) => {
+    const {cardId} = req.body;
+
+    // Check the card id and its relation with the user
+
+    // Detach a PaymentMethod from a Customer
+    const paymentMethod = await stripe.paymentMethods.detach(cardId);
+
+    res.json({ msg: "card " + cardId + " deleted"});
+};
+
 module.exports = {
     createCheckoutSession,
-    getCards
+    getCards,
+    deleteCard
 };
