@@ -75,8 +75,8 @@ const createCheckoutSession = async (req, res) => {
         customer: dbUser.stripeId,
         payment_intent_data: {receipt_email: dbUser.email}, // Send email only if we have production keys
         mode: 'payment',
-        success_url: `${clientUrl}/front/success.html`,
-        cancel_url: `${clientUrl}/front/cancel.html`,
+        success_url: `${clientUrl}/success.html`,
+        cancel_url: `${clientUrl}/cancel.html`,
         expires_at: Math.floor(Date.now() / 1000) + (3600 * 1), // Configured to expire after 1 hour
         payment_intent_data: {  
             setup_future_usage: "on_session" // Attach the payment method to the customer and remember it for future payments
